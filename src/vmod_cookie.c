@@ -252,8 +252,10 @@ vmod_get_re(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 	if (priv_call->priv == NULL) {
 		AZ(pthread_mutex_lock(&mtx));
 		vre = compile_re(ctx, expression);
-		if (!vre)
+		if (!vre) {
+			AZ(pthread_mutex_unlock(&mtx));
 			return(NULL);   // Not much else to do, error already logged.
+		}
 
 		priv_call->priv = vre;
 		priv_call->free = free;
@@ -404,8 +406,10 @@ re_filter(VRT_CTX, struct vmod_priv *priv, struct vmod_priv *priv_call,
 	if (priv_call->priv == NULL) {
 		AZ(pthread_mutex_lock(&mtx));
 		vre = compile_re(ctx, expression);
-		if (!vre)
+		if (!vre) {
+			AZ(pthread_mutex_unlock(&mtx));
 			return;   // Not much else to do, error already logged.
+		}
 
 		priv_call->priv = vre;
 		priv_call->free = free;
